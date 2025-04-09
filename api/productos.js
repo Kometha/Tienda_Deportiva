@@ -1,14 +1,15 @@
-module.exports = function(mysqlConnection) {
-    const express = require('express');
+module.exports = function (mysqlConnection) {
+    const express = require("express");
     const router = express.Router();
 
     // Endpoint para insertar productos
     router.post("/RegistrarProducto", (req, res) => {
         const producto = req.body;
         const sql = "CALL sp_RegistrarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
-        console.log("Datos recibidos:", producto);  // Depuración
-    
+
+        console.log("Datos recibidos:", producto); // Depuración
+        console.log("SQL:", sql); // Depuración
+
         mysqlConnection.query(
             sql,
             [
@@ -21,11 +22,11 @@ module.exports = function(mysqlConnection) {
                 producto.precioVenta,
                 producto.stockInicial,
                 producto.bajoStock,
-                producto.imagen
+                producto.imagen,
             ],
             (err, rows, fields) => {
                 if (!err) {
-                    console.log("Respuesta de la base de datos:", rows);  // Depuración
+                    console.log("Respuesta de la base de datos:", rows); // Depuración
                     res.send("Producto ingresado correctamente!");
                 } else {
                     console.log("Error al insertar producto:", err);
@@ -34,29 +35,26 @@ module.exports = function(mysqlConnection) {
             }
         );
     });
-    
+
     // Endpoint para seleccionar productos
-    router.get("/MostrarProducto/:id", (req, res) => { 
+    router.get("/MostrarProducto/:id", (req, res) => {
         const idProducto = req.params.id;
-        const sql = "CALL sp_MostrarProducto(?)"; 
-        mysqlConnection.query(
-            sql,
-            [idProducto],
-            (err, rows, fields) => {
+        const sql = "CALL sp_MostrarProducto(?)";
+        mysqlConnection.query(sql, [idProducto], (err, rows, fields) => {
             if (!err) {
                 res.status(200).json(rows[0]);
             } else {
-                    res.status(500).send("Error al seleccionar productos.");
-                }
+                res.status(500).send("Error al seleccionar productos.");
             }
-        );
+        });
     });
-    
+
     // Endpoint para actualizar un producto
     router.put("/ActualizarProducto/:id", (req, res) => {
         const productos = req.body;
         const idProducto = req.params.id;
-        const sql = "CALL sp_ActualizarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const sql =
+            "CALL sp_ActualizarProducto(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         mysqlConnection.query(
             sql,
             [
@@ -70,8 +68,7 @@ module.exports = function(mysqlConnection) {
                 productos.precioVenta,
                 productos.stock,
                 productos.bajoStock,
-                productos.imagen
-                
+                productos.imagen,
             ],
             (err, rows, fields) => {
                 if (!err) {
@@ -82,19 +79,21 @@ module.exports = function(mysqlConnection) {
             }
         );
     });
-    
+
     // Endpoint para eliminar un producto
     router.delete("/EliminarProducto/:id", (req, res) => {
         const id = req.params.id;
         const sql = "CALL sp_EliminarProducto(?);";
         mysqlConnection.query(sql, [id], (err, rows, fields) => {
             if (!err) {
-                res.status(200).send(`Producto con ID ${id} eliminado correctamente!`);
+                res.status(200).send(
+                    `Producto con ID ${id} eliminado correctamente!`
+                );
             } else {
                 res.status(500).send("Error al eliminar producto.");
             }
         });
     });
-    
+
     return router;
 };
