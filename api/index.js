@@ -59,6 +59,9 @@ app.use('/compras', comprasRoutes);
 const otrosRoutes = require('./otros')(mysqlConnection);
 app.use('/otros', otrosRoutes);
 
+const authRoutes = require('./auth')(mysqlConnection);
+app.use("/auth", authRoutes);
+
 
 // Ruta principal
 app.get('/', (req, res) => res.send('Servidor en ejecución'));
