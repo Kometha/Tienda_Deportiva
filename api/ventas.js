@@ -1,5 +1,5 @@
 module.exports = function (mysqlConnection) {
-    const express = require('express');
+    const express = require("express");
     const router = express.Router();
 
     // Endpoint para seleccionar ventas o detalles según el parámetro tipo
@@ -28,7 +28,7 @@ module.exports = function (mysqlConnection) {
             sql,
             [
                 venta.idCliente,
-                JSON.stringify(venta.detallesVenta)  // Convertir a JSON string
+                JSON.stringify(venta.detallesVenta), // Convertir a JSON string
             ],
             (err, rows, fields) => {
                 if (!err) {
@@ -53,7 +53,7 @@ module.exports = function (mysqlConnection) {
             [
                 idVenta,
                 venta.idCliente,
-                JSON.stringify(venta.detallesVenta)  // Convertir a JSON string
+                JSON.stringify(venta.detallesVenta), // Convertir a JSON string
             ],
             (err, rows, fields) => {
                 if (!err) {
@@ -70,16 +70,19 @@ module.exports = function (mysqlConnection) {
         const id = req.params.id;
         const sql = "CALL sp_EliminarVenta(?);";
 
+        console.log("ID de venta a eliminar:", id); // Depuración
+
         mysqlConnection.query(sql, [id], (err, rows, fields) => {
             if (!err) {
-                res.status(200).send(`✅ Venta con ID ${id} eliminada correctamente!`);
+                res.status(200).send(
+                    `✅ Venta con ID ${id} eliminada correctamente!`
+                );
             } else {
                 console.error("❌ Error SQL:", err);
                 res.status(500).send("Error al eliminar venta.");
             }
         });
     });
-
 
     return router;
 };
